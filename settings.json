@@ -2,10 +2,21 @@
     "workbench.colorTheme": "Default Dark+",
     "editor.fontSize": 14,
     "editor.tabSize": 2,
+    "editor.fontFamily": "'Fira Code', 'Droid Sans Mono', 'monospace'",
+    "editor.renderWhitespace": "selection",
     "files.autoSave": "afterDelay",
-    "terminal.integrated.fontSize": 14,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true
+    },
+    "terminal.integrated.fontSize": 13,
     "python.linting.enabled": true,
-    "git.enableSmartCommit": true,
     "typescript.updateImportsOnFileMove.enabled": "always",
-    "javascript.updateImportsOnFileMove.enabled": "always"
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "extensions.autoUpdate": false,
+    "security.workspace.trust.enabled": false,
+    "telemetry.telemetryLevel": "off"
 }
