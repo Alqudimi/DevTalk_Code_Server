@@ -1,5 +1,10 @@
 FROM codercom/code-server:latest
 
+USER root
+
+RUN mkdir -p /var/lib/apt/lists/partial && \
+    chmod -R 0755 /var/lib/apt/lists
+
 # تثبيت الحزم الأساسية
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
