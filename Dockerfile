@@ -22,11 +22,22 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
 
 # إنشاء المستخدم
 ARG USERNAME=developer
-ARG USER_UID=1000
-ARG USER_GID=1000
-RUN groupadd --gid ${USER_GID} ${USERNAME} && \
-    useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} && \
-    mkdir -p /etc/sudoers.d && \
+ARG USER_UID=1001
+ARG USER_GID=1001
+
+RUN if ! getent group ${USER_GID}; then \
+        groupadd --gid ${USER_GID} ${USERNAME}; \
+    else \
+        groupmod -n ${USERNAME} $(getent group ${USER_GID} | cut -d: -f1); \
+    fi
+
+# إنشاء المستخدم إذا لم يكن موجوداً
+RUN if ! id -u ${USERNAME}; then \
+        useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME}; \
+    fi
+
+# إعداد sudoers
+RUN mkdir -p /etc/sudoers.d && \
     echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
     chmod 0440 /etc/sudoers.d/${USERNAME}
 
