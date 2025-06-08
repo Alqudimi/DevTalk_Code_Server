@@ -1,7 +1,11 @@
 #!/bin/bash
+echo "Starting code-server with the following configuration:"
+echo "WORKSPACE_DIR: ${WORKSPACE_DIR}"
+echo "CONFIG_DIR: ${CONFIG_DIR}"
+echo "PASSWORD: ${PASSWORD}"
 
 # إنشاء مجلد العمل إذا لم يكن موجوداً
-mkdir -p ${WORKSPACE_DIR}
+mkdir -p ${WORKSPACE_DIR} || exit 1
 
 # إعداد ملف الإعدادات إذا لم يوجد
 if [ ! -f "${CONFIG_DIR}/config.yaml" ]; then
@@ -20,4 +24,5 @@ exec code-server \
   --password ${PASSWORD} \
   --disable-telemetry \
   --disable-update-check \
-  ${WORKSPACE_DIR}
+  ${WORKSPACE_DIR}} || { echo "Failed to start code-server"; exit 1; } 
+  
