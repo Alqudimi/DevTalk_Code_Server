@@ -3,10 +3,8 @@ services:
     name: code-server
     env: docker
     plan: standard
-    region: frankfurt 
+    region: frankfurt
     dockerfilePath: Dockerfile
-    buildArgs:
-      NODE_VERSION: "18.x" 
     healthCheckPath: /
     envVars:
       - key: CODE_SERVER_PASSWORD
@@ -15,8 +13,6 @@ services:
         value: 1000
       - key: PGID
         value: 1000
-      - key: TZ
-        value: Europe/Paris 
     autoDeploy: true
     resources:
       cpu: 2
