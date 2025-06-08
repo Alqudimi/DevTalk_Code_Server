@@ -30,8 +30,10 @@ export PASSWORD
 
 # بدء code-server (بدون --password في سطر الأوامر)
 exec code-server \
-  --bind-addr 0.0.0.0:8080 \
-  --auth password \
-  --disable-telemetry \
-  --disable-update-check \
-  "${WORKSPACE_DIR}"
+    --bind-addr 0.0.0.0:8080 \
+    --header "X-Frame-Options: DENY" \
+    --header "X-Content-Type-Options: nosniff" \
+    --header "Content-Security-Policy: default-src 'self'" \
+    --auth password \
+    --disable-telemetry \
+    "${WORKSPACE_DIR}"
