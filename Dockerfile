@@ -1,6 +1,10 @@
 FROM codercom/code-server:latest
 
 USER root
+ENV SHELL=/bin/bash
+ENV PASSWORD=${CODE_SERVER_PASSWORD:-secure@123}
+ENV CONFIG_DIR=/home/${USERNAME}/.config/code-server
+ENV WORKSPACE_DIR=/home/${USERNAME}/workspace
 
 RUN mkdir -p /var/lib/apt/lists/partial && \
     chmod -R 0755 /var/lib/apt/lists
