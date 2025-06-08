@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: code-server
+    env: docker
+    plan: standard
+    region: frankfurt 
+    dockerfilePath: Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: CODE_SERVER_PASSWORD
+        value: your_secure_password_here
+      - key: PUID
+        value: 1000
+      - key: PGID
+        value: 1000
+      - key: TZ
+        value: Europe/Paris 
+    autoDeploy: true
+    resources:
+      cpu: 2
+      memoryGB: 4
+      diskGB: 10
