@@ -15,5 +15,9 @@ services:
         value: "1000"  # معرّف المجموعة
       - key: TZ
         value: Asia/Riyadh  # المنطقة الزمنية
+      - key: WORKSPACE_DIR
+        value: /home/developer/workspace
+      - key: CONFIG_DIR
+        value: /home/developer/.config/code-server
     autoDeploy: true  # تفعيل النشر التلقائي عند push
  
