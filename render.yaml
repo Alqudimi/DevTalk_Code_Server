@@ -1,24 +1,20 @@
-version: '3.8'
-
 services:
-  code-server:
-    build:
-      context: .
-      args:
-        USER_UID: 1000
-        USER_GID: 1000
-    image: my-code-server
-    restart: always
-    environment:
-      - CODE_SERVER_PASSWORD=your_strong_password_here
-    volumes:
-      - ./workspace:/home/developer/workspace
-      - ./config:/home/developer/.config/code-server
-      - ./extensions:/home/developer/.local/share/code-server/extensions
-    ports:
-      - "8080:8080"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+  - type: web
+    name: code-server
+    env: docker
+    plan: standard
+    region: frankfurt
+    dockerfilePath: Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: CODE_SERVER_PASSWORD
+        value: your_secure_password_here
+      - key: PUID
+        value: 1000
+      - key: PGID
+        value: 1000
+    autoDeploy: true
+    resources:
+      cpu: 2
+      memoryGB: 4
+      diskGB: 10
