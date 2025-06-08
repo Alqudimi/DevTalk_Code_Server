@@ -1,5 +1,5 @@
 
-FROM codercom/code-server:latest
+FROM codercom/code-server:4.22.0 AS builder
 
 
 FROM debian:12-slim
