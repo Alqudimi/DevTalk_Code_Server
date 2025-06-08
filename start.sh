@@ -1,38 +1,23 @@
 #!/bin/bash
 
+# تأكد من وجود مجلد العمل
+mkdir -p $WORKSPACE_DIR
 
-mkdir -p ${WORKSPACE_DIR}
-
-
-if [ ! -f "${CONFIG_DIR}/config.yaml" ]; then
-    cat > ${CONFIG_DIR}/config.yaml <<- EOM
+# إنشاء ملف config إذا لم يكن موجوداً
+if [ ! -f "$CONFIG_DIR/config.yaml" ]; then
+    cat > $CONFIG_DIR/config.yaml <<- EOM
 bind-addr: 0.0.0.0:8080
 auth: password
-password: ${PASSWORD}
+password: $PASSWORD
 cert: false
 EOM
 fi
 
-
-EXTENSIONS=(
-    "ms-python.python"
-    "ms-toolsai.jupyter"
-    "eamodio.gitlens"
-    "dbaeumer.vscode-eslint"
-    "esbenp.prettier-vscode"
-)
-
-for extension in "${EXTENSIONS[@]}"; do
-    code-server --install-extension ${extension} --extensions-dir ${EXTENSIONS_DIR}
-done
-
-
+# بدء code-server مع الإعدادات
 exec code-server \
     --bind-addr 0.0.0.0:8080 \
     --auth password \
-    --password ${PASSWORD} \
+    --password $PASSWORD \
     --disable-telemetry \
     --disable-update-check \
-    --user-data-dir ${CONFIG_DIR} \
-    --extensions-dir ${EXTENSIONS_DIR} \
-    ${WORKSPACE_DIR}
+    $WORKSPACE_DIR
