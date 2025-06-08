@@ -43,4 +43,6 @@ RUN code-server --install-extension ms-python.python && \
 EXPOSE 8080
 USER ${USERNAME}
 WORKDIR ${WORKSPACE_DIR}
+RUN echo "Testing code-server installation..." && \
+    code-server --version
 ENTRYPOINT ["/usr/local/bin/start.sh"]
