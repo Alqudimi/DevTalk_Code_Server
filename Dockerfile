@@ -1,15 +1,8 @@
 FROM codercom/code-server:latest
 
 USER root
-ENV SHELL=/bin/bash
-ENV PASSWORD=${CODE_SERVER_PASSWORD:-secure@123}
-ENV CONFIG_DIR=/home/${USERNAME}/.config/code-server
-ENV WORKSPACE_DIR=/home/${USERNAME}/workspace
 
-RUN mkdir -p /var/lib/apt/lists/partial && \
-    chmod -R 0755 /var/lib/apt/lists
-
-# تثبيت الحزم الأساسية
+# تثبيت الحزم المطلوبة
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     git \
@@ -24,29 +17,21 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
     apt-get install -y nodejs && \
     npm install -g yarn
 
-# إنشاء المستخدم
+# إعداد المستخدم والمجلدات
 ARG USERNAME=developer
 ARG USER_UID=1001
 ARG USER_GID=1001
 
-RUN if ! getent group ${USER_GID}; then \
-        groupadd --gid ${USER_GID} ${USERNAME}; \
-    else \
-        groupmod -n ${USERNAME} $(getent group ${USER_GID} | cut -d: -f1); \
-    fi
+RUN groupadd --gid ${USER_GID} ${USERNAME} || true && \
+    useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} || true && \
+    mkdir -p /etc/sudoers.d && \
+    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/${USERNAME} && \
+    sudo chmod 0440 /etc/sudoers.d/${USERNAME}
 
-# إنشاء المستخدم إذا لم يكن موجوداً
-RUN if ! id -u ${USERNAME}; then \
-        useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME}; \
-    fi
-
-# إعداد sudoers
-RUN mkdir -p /etc/sudoers.d && \
-    echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} && \
-    chmod 0440 /etc/sudoers.d/${USERNAME}
-
-# التحقق من التثبيت قبل تغيير المستخدم
-RUN code-server --version
+# إنشاء المجلدات مسبقاً بصلاحيات صحيحة
+RUN mkdir -p /home/${USERNAME}/workspace && \
+    mkdir -p /home/${USERNAME}/.config/code-server && \
+    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
 
 # نسخ الملفات
 COPY --chown=${USERNAME}:${USERNAME} settings.json /home/${USERNAME}/.config/code-server/
@@ -57,7 +42,14 @@ RUN chmod +x /usr/local/bin/start.sh
 RUN sudo -u ${USERNAME} code-server --install-extension ms-python.python && \
     sudo -u ${USERNAME} code-server --install-extension eamodio.gitlens
 
-EXPOSE 8080
+# تعيين المتغيرات البيئية
+ENV SHELL=/bin/bash
+ENV PASSWORD=${CODE_SERVER_PASSWORD:-secure@123}
+ENV USERNAME=${USERNAME}
+ENV CONFIG_DIR=/home/${USERNAME}/.config/code-server
+ENV WORKSPACE_DIR=/home/${USERNAME}/workspace
+
 USER ${USERNAME}
-WORKDIR /home/${USERNAME}/workspace
+WORKDIR ${WORKSPACE_DIR}
+EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/start.sh"]
