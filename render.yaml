@@ -1,20 +1,19 @@
 services:
   - type: web
-    name: code-server
+    name: code-server-render
     env: docker
-    plan: standard
-    region: frankfurt
+    plan: standard  # يمكن تغييره إلى premium عند الحاجة
+    region: frankfurt  # أو أي منطقة قريبة منك
     dockerfilePath: Dockerfile
-    healthCheckPath: /
+    healthCheckPath: /  # مسار فحص الصحة
     envVars:
       - key: CODE_SERVER_PASSWORD
-        value: your_secure_password_here
+        value: Abdulaziz2004011012  # ⚠️ استبدلها بكلمة سر قوية
       - key: PUID
-        value: 1000
+        value: "1000"  # معرّف المستخدم
       - key: PGID
-        value: 1000
-    autoDeploy: true
-    resources:
-      cpu: 2
-      memoryGB: 4
-      diskGB: 10
+        value: "1000"  # معرّف المجموعة
+      - key: TZ
+        value: Asia/Riyadh  # المنطقة الزمنية
+    autoDeploy: true  # تفعيل النشر التلقائي عند push
+ 
