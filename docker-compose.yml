@@ -2,22 +2,34 @@ version: '3.8'
 
 services:
   code-server:
-    build: .
+    build:
+      context: .
+      args:
+        USER_UID: ${USER_UID:-1000}  # ⬅️ يأخذ القيمة من متغير البيئة أو يستخدم 1000
+        USER_GID: ${USER_GID:-1000}  # ⬅️ يأخذ القيمة من متغير البيئة أو يستخدم 1000
+    image: my-code-server:latest
     container_name: code-server
     restart: unless-stopped
     environment:
-      - CODE_SERVER_PASSWORD=your_local_password
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Paris
+      - CODE_SERVER_PASSWORD=${CODE_SERVER_PASSWORD:-changeme}  # ⬅️ كلمة السر الأساسية
+      - PUID=${USER_UID:-1000}  # ⬅️ لمزامنة صلاحيات الملفات
+      - PGID=${USER_GID:-1000}  # ⬅️ لمزامنة صلاحيات الملفات
+      - WORKSPACE_DIR=/home/coder/workspace  # ⬅️ مسار افتراضي
+      - TZ=${TZ:-Europe/Paris}  # ⬅️ المنطقة الزمنية
     volumes:
-      - ./workspace:/home/coder/workspace
-      - ./config:/home/coder/.config/code-server
-      - ./extensions:/home/coder/.local/share/code-server/extensions
+      - ./workspace:/home/coder/workspace  # ⬅️ ربط مجلد workspace
+      - ./config:/home/coder/.config/code-server  # ⬅️ حفظ الإعدادات
+      - ./extensions:/home/coder/.local/share/code-server/extensions  # ⬅️ حفظ الإضافات
     ports:
-      - "8080:8080"
+      - "8080:8080"  # ⬅️ تعريض المنفذ
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - code-network
+
+networks:
+  code-network:
+    driver: bridge
