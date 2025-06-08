@@ -1,11 +1,23 @@
 #!/bin/bash
-echo "Starting code-server with the following configuration:"
+
+USERNAME=${USERNAME:-developer}
+DEFAULT_WORKSPACE="/home/${USERNAME}/workspace"
+DEFAULT_CONFIG="/home/${USERNAME}/.config/code-server"
+
+WORKSPACE_DIR=${WORKSPACE_DIR:-$DEFAULT_WORKSPACE}
+CONFIG_DIR=${CONFIG_DIR:-$DEFAULT_CONFIG}
+PASSWORD=${PASSWORD:-password}
+
+echo "Starting with configuration:"
+echo "USERNAME: ${USERNAME}"
 echo "WORKSPACE_DIR: ${WORKSPACE_DIR}"
 echo "CONFIG_DIR: ${CONFIG_DIR}"
 echo "PASSWORD: ${PASSWORD}"
 
-# إنشاء مجلد العمل إذا لم يكن موجوداً
-mkdir -p ${WORKSPACE_DIR} || exit 1
+mkdir -p "${WORKSPACE_DIR}" || { echo "Error: Failed to create workspace directory"; exit 1; }
+mkdir -p "${CONFIG_DIR}" || { echo "Error: Failed to create config directory"; exit 1; }
+
+
 
 # إعداد ملف الإعدادات إذا لم يوجد
 if [ ! -f "${CONFIG_DIR}/config.yaml" ]; then
