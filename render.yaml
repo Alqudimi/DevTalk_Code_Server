@@ -8,7 +8,9 @@ services:
     healthCheckPath: /
     envVars:
       - key: CODE_SERVER_PASSWORD
-        value: your_secure_password_here
+        value: "SecurePass@123"
+      - key: PASSWORD
+        value: "SecurePass@123"
       - key: USERNAME
         value: developer
       - key: PUID
