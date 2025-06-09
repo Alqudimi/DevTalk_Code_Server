@@ -19,7 +19,7 @@ services:
       - ./config:/home/developer/.config/code-server
       - ./extensions:/home/developer/.local/share/code-server/extensions
     ports:
-      - "8080:8080"
+      - "8080:10000"
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
       interval: 30s
