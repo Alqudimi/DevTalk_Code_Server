@@ -1,40 +1,44 @@
 #!/bin/bash
 
-# استخدام القيم من ENV أو القيم الافتراضية
-USERNAME=${USERNAME:-developer}
-WORKSPACE_DIR=${WORKSPACE_DIR:-/home/${USERNAME}/workspace}
-CONFIG_DIR=${CONFIG_DIR:-/home/${USERNAME}/.config/code-server}
-PASSWORD=${PASSWORD:-secure@123}
-PORT=${PORT:-8080}
+# القيم الافتراضية الآمنة
+USER=${USER:-developer}
+PASSWORD=${PASSWORD:-$(openssl rand -base64 12)}
+WORKSPACE_DIR=${WORKSPACE_DIR:-/home/${USER}/workspace}
+CONFIG_DIR=${CONFIG_DIR:-/home/${USER}/.config/code-server}
+EXTENSIONS_DIR=${EXTENSIONS_DIR:-/home/${USER}/.local/share/code-server/extensions}
 
-# إنشاء المجلدات إذا لم تكن موجودة
-mkdir -p "${WORKSPACE_DIR}" || { echo "Error: Failed to create workspace directory"; exit 1; }
-mkdir -p "${CONFIG_DIR}" || { echo "Error: Failed to create config directory"; exit 1; }
-mkdir -p "/home/${USERNAME}/.local/share/code-server/extensions" || { echo "Error: Failed to create extensions directory"; exit 1; }
+# إنشاء المجلدات الأساسية
+mkdir -p ${WORKSPACE_DIR} ${CONFIG_DIR} ${EXTENSIONS_DIR}
 
-# إنشاء ملف config.yaml إذا لم يكن موجوداً
+# تسجيل الإعدادات (لأغراض تصحيح الأخطاء)
+cat <<EOF
+=== إعدادات التشغيل ===
+المستخدم: ${USER}
+كلمة المرور: ${PASSWORD}
+مسار العمل: ${WORKSPACE_DIR}
+مسار التكوين: ${CONFIG_DIR}
+مسار الإضافات: ${EXTENSIONS_DIR}
+======================
+EOF
+
+# كتابة ملف التكوين إذا لم يكن موجوداً
 if [ ! -f "${CONFIG_DIR}/config.yaml" ]; then
-    cat > "${CONFIG_DIR}/config.yaml" <<- EOM
-bind-addr: 0.0.0.0:${PORT}
+  cat > "${CONFIG_DIR}/config.yaml" <<- EOM
+bind-addr: 0.0.0.0:8080
 auth: password
 password: ${PASSWORD}
 cert: false
 disable-telemetry: true
 disable-update-check: true
-disable-workspace-trust: true
 EOM
 fi
 
-# ضبط صلاحيات الملفات
-chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
-
 # بدء code-server
 exec code-server \
-    --bind-addr 0.0.0.0:${PORT} \
-    --auth password \
-    --password "${PASSWORD}" \
-    --disable-telemetry \
-    --disable-update-check \
-    --user-data-dir "/home/${USERNAME}/.local/share/code-server" \
-    --extensions-dir "/home/${USERNAME}/.local/share/code-server/extensions" \
-    "${WORKSPACE_DIR}"
+  --bind-addr 0.0.0.0:8080 \
+  --config "${CONFIG_DIR}/config.yaml" \
+  --user-data-dir "/home/${USER}/.local/share/code-server" \
+  --extensions-dir "${EXTENSIONS_DIR}" \
+  --disable-telemetry \
+  --disable-update-check \
+  "${WORKSPACE_DIR}"
