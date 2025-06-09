@@ -1,4 +1,4 @@
-bind-addr: 0.0.0.0:10000
+bind-addr: 0.0.0.0:8080
 auth: password
 password: SecurePass@123
 cert: false
