@@ -11,18 +11,8 @@ services:
         value: "SecurePass@123"
       - key: PASSWORD
         value: "SecurePass@123"
-      - key: USERNAME
+      - key: USER
         value: "developer"
-      - key: PUID
-        value: "1000"
-      - key: PGID
-        value: "1000"
       - key: PORT
         value: "8080"
-      - key: TZ
-        value: "Europe/Berlin"
     autoDeploy: true
-    disk:
-      name: code-server-storage
-      mountPath: /home/developer
-      sizeGB: 10
