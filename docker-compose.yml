@@ -5,31 +5,28 @@ services:
     build:
       context: .
       args:
-        USER_UID: 1000
-        USER_GID: 1000
+        USER_UID: 1001
+        USER_GID: 1001
     image: my-code-server
-    container_name: code-server
     restart: unless-stopped
     environment:
-      - CODE_SERVER_PASSWORD=${CODE_SERVER_PASSWORD:-SecurePass@123}
-      - PASSWORD=${PASSWORD:-SecurePass@123}
-      - USERNAME=developer
+      - CODE_SERVER_PASSWORD=SecurePass@123
+      - PASSWORD=SecurePass@123
+      - USER=developer
       - PORT=8080
-      - TZ=Europe/Berlin
     volumes:
       - ./workspace:/home/developer/workspace
       - ./config:/home/developer/.config/code-server
       - ./extensions:/home/developer/.local/share/code-server/extensions
-      - ./user-data:/home/developer/.local/share/code-server
     ports:
       - "8080:8080"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1GB
