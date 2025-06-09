@@ -7,6 +7,8 @@ services:
     dockerfilePath: Dockerfile
     healthCheckPath: /
     envVars:
+      - key: CODE_SECURITY_HEADERS
+        value: "true"
       - key: CODE_SERVER_PASSWORD
         value: "SecurePass@123"
       - key: PASSWORD
