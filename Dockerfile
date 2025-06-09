@@ -38,6 +38,10 @@ RUN groupadd --gid ${USER_GID} ${USERNAME} && \
 COPY --chown=${USERNAME}:${USERNAME} config.yaml /home/${USERNAME}/.config/code-server/
 COPY --chown=${USERNAME}:${USERNAME} settings.json /home/${USERNAME}/.config/code-server/
 COPY --chown=${USERNAME}:${USERNAME} start.sh /usr/local/bin/
+# بعد سطر COPY الأخير، أضف:
+RUN echo "server_tokens off;" > /etc/nginx/conf.d/security.conf && \
+    echo "add_header X-Frame-Options DENY;" >> /etc/nginx/conf.d/security.conf && \
+    echo "add_header X-Content-Type-Options nosniff;" >> /etc/nginx/conf.d/security.conf
 RUN chmod +x /usr/local/bin/start.sh
 
 # تثبيت الإضافات
