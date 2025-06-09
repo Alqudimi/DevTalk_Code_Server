@@ -26,14 +26,19 @@ cert: false
 EOM
 
 # تصدير متغير PASSWORD للبيئة
-export PASSWORD
 
-# بدء code-server (بدون --password في سطر الأوامر)
+
+# معالجة القيم الافتراضية إذا لم يتم تعيينها
+export PASSWORD=${PASSWORD:-$(openssl rand -base64 12)}
+export USER=${USER:-developer}
+export PORT=${PORT:-8080}
+
+# إنشاء المسارات إذا لم تكن موجودة
+mkdir -p "${USER_DATA_DIR:-/home/$USER/.local/share/code-server}"
+mkdir -p "${EXTENSIONS_DIR:-/home/$USER/.local/share/code-server/extensions}"
+mkdir -p "${LOG_DIR:-/home/$USER/.local/share/code-server/logs}"
+
+# بدء code-server مع التهيئة الذكية
 exec code-server \
-    --bind-addr 0.0.0.0:8080 \
-    --header "X-Frame-Options: DENY" \
-    --header "X-Content-Type-Options: nosniff" \
-    --header "Content-Security-Policy: default-src 'self'" \
-    --auth password \
-    --disable-telemetry \
-    "${WORKSPACE_DIR}"
+  --config /path/to/config.yaml \
+  --bind-addr 0.0.0.0:$PORT
