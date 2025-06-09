@@ -6,3 +6,6 @@ disable-telemetry: true
 disable-update-check: true
 user-data-dir: /home/developer/.local/share/code-server
 extensions-dir: /home/developer/.local/share/code-server/extensions
+disable-auth: false
+disable-password: false
+disable-cors: false
