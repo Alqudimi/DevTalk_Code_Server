@@ -59,7 +59,7 @@ RUN code-server --install-extension ms-python.python && \
 # تعيين المتغيرات البيئية
 ENV SHELL=/bin/bash
 ENV USER=${USERNAME}
-ENV PASSWORD=${CODE_SERVER_PASSWORD:-secure@123}
+ENV PASSWORD=${CODE_SERVER_PASSWORD:-SecurePass@123}
 ENV CONFIG_DIR=/home/${USERNAME}/.config/code-server
 ENV WORKSPACE_DIR=/home/${USERNAME}/workspace
 ENV EXTENSIONS_DIR=/home/${USERNAME}/.local/share/code-server/extensions
