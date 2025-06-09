@@ -4,19 +4,36 @@
     "editor.tabSize": 2,
     "editor.fontFamily": "'Fira Code', 'Droid Sans Mono', 'monospace'",
     "editor.renderWhitespace": "selection",
+    "editor.wordWrap": "on",
+    "editor.minimap.enabled": true,
+    "editor.autoClosingBrackets": "always",
+    "editor.formatOnSave": true,
     "files.autoSave": "afterDelay",
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
-        "**/node_modules": true
+        "**/node_modules": true,
+        "**/.venv": true
     },
     "terminal.integrated.fontSize": 13,
+    "terminal.integrated.fontFamily": "'Fira Code', 'Droid Sans Mono', 'monospace'",
     "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.formatting.provider": "black",
+    "python.analysis.typeCheckingMode": "basic",
     "typescript.updateImportsOnFileMove.enabled": "always",
     "javascript.updateImportsOnFileMove.enabled": "always",
     "git.confirmSync": false,
     "git.enableSmartCommit": true,
+    "git.autofetch": true,
     "extensions.autoUpdate": false,
     "security.workspace.trust.enabled": false,
-    "telemetry.telemetryLevel": "off"
+    "telemetry.telemetryLevel": "off",
+    "workbench.startupEditor": "none",
+    "workbench.editor.enablePreview": false,
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "prettier.singleQuote": true,
+    "prettier.semi": false,
+    "eslint.alwaysShowStatus": true
 }
