@@ -1,29 +1,25 @@
-# ملف config.yaml ذكي (يدعم القيم الافتراضية والتهيئة التلقائية)
+# config.yaml صالح لـ code-server 4.x+
 bind-addr: 0.0.0.0:${PORT:-8080}
 auth: password
-password: ${PASSWORD:-$(echo "default_secure_password_$(date +%s | sha256sum | base64 | head -c 16)"}
+password: ${PASSWORD:-default_password}
 
-# إعدادات الأمان (باستخدام القيم الافتراضية إذا لم يتم تعيينها)
-security:
-  cors-origin: "${CORS_ORIGIN:-https://devtalk-code-server.onrender.com}"
-  strict-transport-security: "${HSTS_HEADER:-max-age=31536000; includeSubDomains}"
-  x-frame-options: "${XFRAME_OPTIONS:-DENY}"
-  content-security-policy: "${CSP_HEADER:-default-src 'self'; script-src 'self' 'unsafe-inline'}"
-  x-xss-protection: "${XSS_PROTECTION:-1; mode=block}"
+# إعدادات الشبكة
+proxy-protocol: false
+socket: /home/developer/.config/code-server/socket.sock
 
 # إعدادات التطبيق
-disable-telemetry: ${DISABLE_TELEMETRY:-true}
-disable-update-check: ${DISABLE_UPDATE_CHECK:-true}
-disable-workspace-trust: ${DISABLE_WORKSPACE_TRUST:-true}
+disable-telemetry: true
+disable-update-check: true
+disable-workspace-trust: true
 
-# إنشاء مسارات تلقائية إذا لم تكن موجودة
-user-data-dir: ${USER_DATA_DIR:-/home/${USER:-developer}/.local/share/code-server}
-extensions-dir: ${EXTENSIONS_DIR:-/home/${USER:-developer}/.local/share/code-server/extensions}
-log-dir: ${LOG_DIR:-/home/${USER:-developer}/.local/share/code-server/logs}
-socket: ${SOCKET_PATH:-/home/${USER:-developer}/.config/code-server/socket.sock}
+# إعدادات المحرر
+editor:
+  font-family: "Fira Code, Droid Sans Mono, monospace"
+  font-size: 14
+  tab-size: 2
+  auto-save: "on"
 
-# إعدادات WebSocket (بمنفذ عشوائي إذا لم يتم التحديد)
-wss-port: ${WSS_PORT:-$((8080 + RANDOM % 1000))}
-
-# تحميل إعدادات إضافية من ملف خارجي إذا وجد (اختياري)
-import: ${EXTRA_CONFIG:-/etc/code-server/extra-config.yaml}
+# إعدادات التمديدات (يتم تثبيتها عبر Dockerfile)
+extensions:
+  - ms-python.python
+  - eamodio.gitlens
