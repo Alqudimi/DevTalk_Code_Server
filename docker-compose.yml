@@ -11,6 +11,7 @@ services:
     restart: always
     environment:
       - CODE_SERVER_PASSWORD="SecurePass@123"
+      - PASSWORD="SecurePass@123"
       - WORKSPACE_DIR=/home/developer/workspace
       - CONFIG_DIR=/home/developer/.config/code-server
       - PORT=3000
