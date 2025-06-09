@@ -38,6 +38,10 @@ env | grep -E 'USER|PASSWORD|EXTENSIONS'
 echo "=== محتويات مجلد التكوين ==="
 ls -la $CONFIG_DIR
 
+
+
+
+
 # بدء code-server
 exec code-server \
   --bind-addr 0.0.0.0:8080 \
