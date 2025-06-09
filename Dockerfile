@@ -36,6 +36,7 @@ RUN mkdir -p /home/${USERNAME}/workspace && \
 # نسخ الملفات
 COPY --chown=${USERNAME}:${USERNAME} settings.json /home/${USERNAME}/.config/code-server/
 COPY start.sh /usr/local/bin/
+COPY --chown=developer:developer config.yaml /home/developer/.config/code-server/
 RUN chmod +x /usr/local/bin/start.sh
 
 # تثبيت الإضافات
