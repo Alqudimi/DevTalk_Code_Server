@@ -1,34 +1,8 @@
-bind-addr: 0.0.0.0:${PORT:-8080}
+bind-addr: 0.0.0.0:8080
 auth: password
-password: ${PASSWORD:-secure@123}
+password: ${PASSWORD}
 cert: false
-
-# إعدادات الأمان
 disable-telemetry: true
 disable-update-check: true
-disable-workspace-trust: true
-
-# إعدادات الشبكة
-proxy-protocol: false
-
-# إعدادات المحرر
-editor-settings:
-  font-family: "Fira Code, Droid Sans Mono, monospace"
-  font-size: 14
-  tab-size: 2
-  auto-save: "on"
-  render-whitespace: "selection"
-
-# إعدادات العمل
-workspace:
-  auto-save: "afterDelay"
-  exclude:
-    "**/.git": true
-    "**/.DS_Store": true
-    "**/node_modules": true
-
-# إعدادات اللغة
-python:
-  linting:
-    enabled: true
-    pylint-enabled: true
+user-data-dir: /home/developer/.local/share/code-server
+extensions-dir: /home/developer/.local/share/code-server/extensions
