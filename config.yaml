@@ -1,25 +1,34 @@
-# config.yaml صالح لـ code-server 4.x+
 bind-addr: 0.0.0.0:${PORT:-8080}
 auth: password
-password: ${PASSWORD:-default_password}
+password: ${PASSWORD:-secure@123}
+cert: false
 
-# إعدادات الشبكة
-proxy-protocol: false
-socket: /home/developer/.config/code-server/socket.sock
-
-# إعدادات التطبيق
+# إعدادات الأمان
 disable-telemetry: true
 disable-update-check: true
 disable-workspace-trust: true
 
+# إعدادات الشبكة
+proxy-protocol: false
+
 # إعدادات المحرر
-editor:
+editor-settings:
   font-family: "Fira Code, Droid Sans Mono, monospace"
   font-size: 14
   tab-size: 2
   auto-save: "on"
+  render-whitespace: "selection"
 
-# إعدادات التمديدات (يتم تثبيتها عبر Dockerfile)
-extensions:
-  - ms-python.python
-  - eamodio.gitlens
+# إعدادات العمل
+workspace:
+  auto-save: "afterDelay"
+  exclude:
+    "**/.git": true
+    "**/.DS_Store": true
+    "**/node_modules": true
+
+# إعدادات اللغة
+python:
+  linting:
+    enabled: true
+    pylint-enabled: true
