@@ -39,10 +39,12 @@ COPY start.sh /usr/local/bin/
 COPY --chown=developer:developer config.yaml /home/developer/.config/code-server/
 RUN chmod +x /usr/local/bin/start.sh
 
-# تثبيت الإضافات
-RUN sudo -u ${USERNAME} code-server --install-extension ms-python.python && \
-    sudo -u ${USERNAME} code-server --install-extension eamodio.gitlens
 
+# في قسم تثبيت الإضافات، استخدم هذا الشكل:
+RUN mkdir -p /home/${USERNAME}/.local/share/code-server/extensions && \
+    chown -R ${USERNAME}:${USERNAME} /home/${USERNAME} && \
+    code-server --install-extension ms-python.python && \
+    code-server --install-extension eamodio.gitlens
 # تعيين المتغيرات البيئية
 ENV SHELL=/bin/bash
 ENV PASSWORD=${CODE_SERVER_PASSWORD:-secure@123}
