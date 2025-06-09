@@ -41,4 +41,11 @@ mkdir -p "${LOG_DIR:-/home/$USER/.local/share/code-server/logs}"
 # بدء code-server مع التهيئة الذكية
 exec code-server \
   --config /path/to/config.yaml \
-  --bind-addr 0.0.0.0:$PORT
+  --bind-addr 0.0.0.0:${PORT:-8080} \
+  --auth password \
+  --password "${PASSWORD:-default_password}" \
+  --disable-telemetry \
+  --header "X-Frame-Options: DENY" \
+  --header "Content-Security-Policy: default-src 'self'" \
+  --header "X-Content-Type-Options: nosniff" \
+  /home/developer/workspace
