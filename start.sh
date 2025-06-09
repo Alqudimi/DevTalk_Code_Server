@@ -24,7 +24,7 @@ EOF
 # كتابة ملف التكوين إذا لم يكن موجوداً
 if [ ! -f "${CONFIG_DIR}/config.yaml" ]; then
   cat > "${CONFIG_DIR}/config.yaml" <<- EOM
-bind-addr: 0.0.0.0:8080
+bind-addr: 0.0.0.0:10000
 auth: password
 password: ${PASSWORD}
 cert: false
