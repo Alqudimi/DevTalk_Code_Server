@@ -44,7 +44,7 @@ ls -la $CONFIG_DIR
 
 # بدء code-server
 exec code-server \
-  --bind-addr 0.0.0.0:10000 \
+  --bind-addr 0.0.0.0:8080 \
   --config "${CONFIG_DIR}/config.yaml" \
   --user-data-dir "/home/${USER}/.local/share/code-server" \
   --extensions-dir "${EXTENSIONS_DIR}" \
