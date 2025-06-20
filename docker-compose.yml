@@ -1,0 +1,57 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  code-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - code-server-data:/home/coder/project
+    environment:
+      - PASSWORD=SecurePass@123
+      - SUDO_PASSWORD=SudoSecurePass@123
+    networks:
+      - code-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - code-server
+      - postgres
+    environment:
+      - CODE_SERVER_URL=http://code-server:8080
+      - DATABASE_URL=postgresql://user:password@postgres:5432/code_server_db
+      - SECRET_KEY=your-secret-key-here
+    networks:
+      - code-network
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=code_server_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - code-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d code_server_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  code-server-data:
+  postgres-data:
+
+networks:
+  code-network:
+    driver: bridge

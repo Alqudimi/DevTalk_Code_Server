@@ -1,0 +1,30 @@
+# render-api-gateway.yaml
+services:
+  - type: web
+    name: code-server-api-gateway
+    env: docker
+    plan: standard
+    region: frankfurt
+    dockerfilePath: api-gateway/Dockerfile
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: CODE_SERVER_URL
+        value: "http://code-server:8080"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: "postgresql://user:password@postgres:5432/code_server_db"
+    autoDeploy: yes
+    numInstances: 1
+    resources:
+      cpu: 1
+      memory: 2GB
+      disk: 5GB
+
+  - type: postgres
+    name: postgres
+    plan: standard
+    region: frankfurt
+    databaseName: code_server_db
+    user: user
+    password: password
