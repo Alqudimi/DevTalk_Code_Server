@@ -27,10 +27,11 @@ RUN sudo apt-get update && \
     zsh && \
     sudo rm -rf /var/lib/apt/lists/*
 
-# تثبيت Node.js و npm و yarn لأدوات تطوير الويب
+# تثبيت Node.js و npm و yarn لأدوات تطوير الو
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
     sudo apt-get install -y nodejs && \
-    sudo npm install -g yarn
+    sudo npm install -g npm@latest && \  # تحديث npm لأحدث إصدار
+    sudo npm install -g yarn --ignore-deprecated  # تجاهل التحذيرات للمهمل
 
 # تثبيت أدوات تطوير لغات البرمجة المختلفة
 # Java
@@ -68,6 +69,9 @@ RUN sudo apt-get update && \
 # تثبيت Docker داخل Docker (لأغراض التطوير)
 RUN curl -fsSL https://get.docker.com | sh
 
+RUN curl -I https://open-vsx.org && \
+    curl -I https://marketplace.visualstudio.com
+
 # تثبيت أدوات CLI إضافية
 RUN sudo npm install -g \
     typescript \
@@ -90,11 +94,13 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 # نسخ ملفات التكوين المخصصة
 COPY .zshrc /home/coder/.zshrc
 COPY settings.json /home/coder/.local/share/code-server/User/settings.json
-COPY extensions.sh /tmp/extensions.sh
 
-# تثبيت إضافات VS Code (بما في ذلك GitLens)
-RUN chmod +x /tmp/extensions.sh && /tmp/extensions.sh
 
+# استخدم هذا:
+COPY extensions.sh /usr/local/bin/install-extensions
+RUN chown coder:coder /usr/local/bin/install-extensions && \
+    chmod 755 /usr/local/bin/install-extensions && \
+    sudo -u coder /usr/local/bin/install-extensions
 # تعيين الأذونات والمستخدم
 RUN sudo chown -R coder:coder /home/coder && \
     sudo usermod -aG sudo coder && \
