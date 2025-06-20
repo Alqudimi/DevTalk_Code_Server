@@ -1,20 +1,19 @@
 services:
   - type: web
-    name: code-server-render
+    name: code-server
     env: docker
     plan: standard
-    region: frankfurt
+    region: frankfurt # اختر المنطقة الأقرب إليك
     dockerfilePath: Dockerfile
     healthCheckPath: /
     envVars:
-      - key: CODE_SECURITY_HEADERS
-        value: "true"
-      - key: CODE_SERVER_PASSWORD
-        value: "SecurePass@123"
       - key: PASSWORD
         value: "SecurePass@123"
-      - key: USER
-        value: "developer"
-      - key: PORT
-        value: "8080"
-    autoDeploy: true
+      - key: SUDO_PASSWORD
+        value: "SudoSecurePass@123"
+    autoDeploy: yes
+    numInstances: 1
+    resources:
+      cpu: 2
+      memory: 4GB
+      disk: 10GB
