@@ -1,31 +1,43 @@
 # استخدام الصورة الأساسية لـ code-server مع أحدث إصدار من Ubuntu
 FROM codercom/code-server:latest
-
+FROM ubuntu:22.04
+# ثم تثبيت code-server يدويًا
 # تعيين متغيرات البيئة
 ENV DEBIAN_FRONTEND=noninteractive
 ENV SHELL=/bin/bash
 ENV PATH="/home/coder/.local/bin:${PATH}"
 
 # تثبيت التبعيات الأساسية والأدوات المطلوبة
-RUN apt-get update && \
-    apt-get install -y \
+# الخطوة 1: تحديث مصادر الحزم
+RUN apt-get update
+
+# الخطوة 2: تثبيت الحزم الأساسية (المجموعة الأولى)
+RUN apt-get install -y \
     build-essential \
     curl \
     git \
     gnupg2 \
     htop \
     libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# الخطوة 3: تثبيت الحزم الأساسية (المجموعة الثانية)
+RUN apt-get update && apt-get install -y \
     net-tools \
     openssh-server \
     python3 \
     python3-pip \
     python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+# الخطوة 4: تثبيت الحزم الأساسية (المجموعة الثالثة)
+RUN apt-get update && apt-get install -y \
     rsync \
     sudo \
     unzip \
     wget \
-    zsh && \
-    rm -rf /var/lib/apt/lists/*
+    zsh \
+    && rm -rf /var/lib/apt/lists/*
 
 # تثبيت Node.js و npm و yarn لأدوات تطوير الويب
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
