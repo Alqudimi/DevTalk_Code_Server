@@ -7,8 +7,8 @@ ENV SHELL=/bin/bash
 ENV PATH="/home/coder/.local/bin:${PATH}"
 
 # تثبيت التبعيات الأساسية والأدوات المطلوبة
-RUN sudo apt-get update && \
-    sudo apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
     build-essential \
     curl \
     git \
@@ -21,27 +21,26 @@ RUN sudo apt-get update && \
     python3-pip \
     python3-venv \
     rsync \
-    sudo \
     unzip \
     wget \
     zsh && \
-    sudo rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
-# تثبيت Node.js و npm و yarn لأدوات تطوير الو
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && \
-    sudo apt-get install -y nodejs && \
-    sudo npm install -g npm@latest && \  # تحديث npm لأحدث إصدار
-    sudo npm install -g yarn --ignore-deprecated  # تجاهل التحذيرات للمهمل
+# تثبيت Node.js و npm و yarn لأدوات تطوير الويب
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm@latest && \
+    npm install -g yarn --ignore-deprecated
 
 # تثبيت أدوات تطوير لغات البرمجة المختلفة
 # Java
-RUN sudo apt-get update && \
-    sudo apt-get install -y openjdk-17-jdk maven gradle && \
-    sudo rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jdk maven gradle && \
+    rm -rf /var/lib/apt/lists/*
 
 # Go
 RUN wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz && \
-    sudo tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz && \
     rm go1.21.0.linux-amd64.tar.gz
 ENV PATH="/usr/local/go/bin:${PATH}"
 
@@ -51,20 +50,20 @@ ENV PATH="/home/coder/.cargo/bin:${PATH}"
 
 # .NET Core
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
-    sudo dpkg -i packages-microsoft-prod.deb && \
-    sudo apt-get update && \
-    sudo apt-get install -y dotnet-sdk-6.0 && \
-    sudo rm -rf /var/lib/apt/lists/*
+    dpkg -i packages-microsoft-prod.deb && \
+    apt-get update && \
+    apt-get install -y dotnet-sdk-6.0 && \
+    rm -rf /var/lib/apt/lists/*
 
 # PHP
-RUN sudo apt-get update && \
-    sudo apt-get install -y php php-cli php-common php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath && \
-    sudo rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y php php-cli php-common php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath && \
+    rm -rf /var/lib/apt/lists/*
 
 # Ruby
-RUN sudo apt-get update && \
-    sudo apt-get install -y ruby-full && \
-    sudo rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y ruby-full && \
+    rm -rf /var/lib/apt/lists/*
 
 # تثبيت Docker داخل Docker (لأغراض التطوير)
 RUN curl -fsSL https://get.docker.com | sh
@@ -73,7 +72,7 @@ RUN curl -I https://open-vsx.org && \
     curl -I https://marketplace.visualstudio.com
 
 # تثبيت أدوات CLI إضافية
-RUN sudo npm install -g \
+RUN npm install -g \
     typescript \
     eslint \
     prettier \
@@ -95,15 +94,15 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 COPY .zshrc /home/coder/.zshrc
 COPY settings.json /home/coder/.local/share/code-server/User/settings.json
 
-
-# استخدم هذا:
+# تثبيت إضافات VS Code
 COPY extensions.sh /usr/local/bin/install-extensions
 RUN chown coder:coder /usr/local/bin/install-extensions && \
     chmod 755 /usr/local/bin/install-extensions && \
-    sudo -u coder /usr/local/bin/install-extensions
+    su coder -c "/usr/local/bin/install-extensions"
+
 # تعيين الأذونات والمستخدم
-RUN sudo chown -R coder:coder /home/coder && \
-    sudo usermod -aG sudo coder && \
+RUN chown -R coder:coder /home/coder && \
+    usermod -aG sudo coder && \
     echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # تعيين مجلد العمل
