@@ -6,9 +6,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV SHELL=/bin/bash
 ENV PATH="/home/coder/.local/bin:${PATH}"
 
-# تثبيت التبعيات الأساسية والأدوات المطلوبة
+# تحديث الحزم الأساسية وتثبيت الأدوات الأساسية
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
     build-essential \
     curl \
     git \
@@ -24,22 +25,26 @@ RUN apt-get update && \
     unzip \
     wget \
     zsh && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# تثبيت Node.js و npm و yarn لأدوات تطوير الويب
+# تثبيت Node.js و npm و yarn
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
     apt-get install -y nodejs && \
-    npm install -g npm@latest && \
-    npm install -g yarn --ignore-deprecated
+    npm install -g npm@latest yarn --ignore-deprecated
 
-# تثبيت أدوات تطوير لغات البرمجة المختلفة
+# تثبيت أدوات تطوير لغات البرمجة
 # Java
 RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk maven gradle && \
+    apt-get install -y --no-install-recommends \
+    openjdk-17-jdk \
+    maven \
+    gradle && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Go
-RUN wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz && \
+RUN wget -q https://go.dev/dl/go1.21.0.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz && \
     rm go1.21.0.linux-amd64.tar.gz
 ENV PATH="/usr/local/go/bin:${PATH}"
@@ -49,27 +54,38 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/home/coder/.cargo/bin:${PATH}"
 
 # .NET Core
-RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
-    apt-get install -y dotnet-sdk-6.0 && \
+    apt-get install -y --no-install-recommends dotnet-sdk-6.0 && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # PHP
 RUN apt-get update && \
-    apt-get install -y php php-cli php-common php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath && \
+    apt-get install -y --no-install-recommends \
+    php \
+    php-cli \
+    php-common \
+    php-mysql \
+    php-zip \
+    php-gd \
+    php-mbstring \
+    php-curl \
+    php-xml \
+    php-pear \
+    php-bcmath && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Ruby
 RUN apt-get update && \
-    apt-get install -y ruby-full && \
+    apt-get install -y --no-install-recommends ruby-full && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# تثبيت Docker داخل Docker (لأغراض التطوير)
+# تثبيت Docker
 RUN curl -fsSL https://get.docker.com | sh
-
-RUN curl -I https://open-vsx.org && \
-    curl -I https://marketplace.visualstudio.com
 
 # تثبيت أدوات CLI إضافية
 RUN npm install -g \
@@ -80,7 +96,7 @@ RUN npm install -g \
     @vue/cli \
     create-react-app
 
-# تكوين Zsh كصدفة افتراضية مع Oh-My-Zsh
+# تكوين Zsh
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.5/zsh-in-docker.sh)" -- \
     -t robbyrussell \
     -p git \
@@ -90,26 +106,24 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
     -p https://github.com/zsh-users/zsh-syntax-highlighting \
     -p https://github.com/zsh-users/zsh-autosuggestions
 
-# نسخ ملفات التكوين المخصصة
+# نسخ ملفات التكوين
 COPY .zshrc /home/coder/.zshrc
 COPY settings.json /home/coder/.local/share/code-server/User/settings.json
-
-# تثبيت إضافات VS Code
 COPY extensions.sh /usr/local/bin/install-extensions
-RUN chown coder:coder /usr/local/bin/install-extensions && \
-    chmod 755 /usr/local/bin/install-extensions && \
-    su coder -c "/usr/local/bin/install-extensions"
 
-# تعيين الأذونات والمستخدم
-RUN chown -R coder:coder /home/coder && \
-    usermod -aG sudo coder && \
+# تعيين الأذونات
+RUN chmod +x /usr/local/bin/install-extensions && \
+    chown -R coder:coder /home/coder && \
+    usermod -aG docker coder && \
     echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# تعيين مجلد العمل
-WORKDIR /home/coder/project
+# تثبيت إضافات VS Code
+USER coder
+RUN /usr/local/bin/install-extensions
 
-# تعيين المنفذ
+# إعدادات نهائية
+USER root
+WORKDIR /home/coder/project
 EXPOSE 8080
 
-# الأمر الافتراضي لبدء الخدمة
 ENTRYPOINT ["dumb-init", "code-server", "--bind-addr", "0.0.0.0:8080", "."]
