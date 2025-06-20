@@ -1,89 +1,89 @@
-# استخدام الصورة الأساسية لـ code-server مع أحدث إصدار من Ubuntu
-FROM codercom/code-server:latest
+# استخدام صورة Ubuntu 22.04 كقاعدة ثم تثبيت code-server يدوياً
 FROM ubuntu:22.04
-# ثم تثبيت code-server يدويًا
+
 # تعيين متغيرات البيئة
-ENV DEBIAN_FRONTEND=noninteractive
-ENV SHELL=/bin/bash
-ENV PATH="/home/coder/.local/bin:${PATH}"
+ENV DEBIAN_FRONTEND=noninteractive \
+    SHELL=/bin/bash \
+    PATH="/home/coder/.local/bin:/usr/local/go/bin:/home/coder/.cargo/bin:${PATH}" \
+    CODER_VERSION=4.23.0
 
-# تثبيت التبعيات الأساسية والأدوات المطلوبة
-# الخطوة 1: تحديث مصادر الحزم
-RUN apt-get update
+# إنشاء مستخدم coder مع صلاحيات sudo
+RUN useradd -m -s /bin/bash coder && \
+    apt-get update && \
+    apt-get install -y sudo && \
+    echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    mkdir -p /home/coder/.local/share/code-server/User && \
+    chown -R coder:coder /home/coder
 
-# الخطوة 2: تثبيت الحزم الأساسية (المجموعة الأولى)
-RUN apt-get install -y \
+# تثبيت التبعيات الأساسية على مراحل
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     git \
     gnupg2 \
     htop \
     libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# الخطوة 3: تثبيت الحزم الأساسية (المجموعة الثانية)
-RUN apt-get update && apt-get install -y \
     net-tools \
     openssh-server \
     python3 \
     python3-pip \
     python3-venv \
-    && rm -rf /var/lib/apt/lists/*
-
-# الخطوة 4: تثبيت الحزم الأساسية (المجموعة الثالثة)
-RUN apt-get update && apt-get install -y \
     rsync \
-    sudo \
     unzip \
     wget \
     zsh \
+    ca-certificates \
+    dumb-init \
     && rm -rf /var/lib/apt/lists/*
 
-# تثبيت Node.js و npm و yarn لأدوات تطوير الويب
+# تثبيت Node.js و npm و yarn
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
     apt-get install -y nodejs && \
-    npm install -g npm@latest && \
-    npm install -g yarn
+    npm install -g npm@latest yarn && \
+    rm -rf /var/lib/apt/lists/*
 
-# تثبيت أدوات تطوير لغات البرمجة المختلفة
-# Java
+# تثبيت أدوات تطوير اللغات
+## Java
 RUN apt-get update && \
     apt-get install -y openjdk-17-jdk maven gradle && \
     rm -rf /var/lib/apt/lists/*
 
-# Go
-RUN wget https://go.dev/dl/go1.21.0.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.21.0.linux-amd64.tar.gz && \
-    rm go1.21.0.linux-amd64.tar.gz
-ENV PATH="/usr/local/go/bin:${PATH}"
+## Go
+RUN curl -fsSL https://go.dev/dl/go1.21.0.linux-amd64.tar.gz | tar -C /usr/local -xz
 
-# Rust
+## Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/home/coder/.cargo/bin:${PATH}"
 
-# .NET Core
-RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+## .NET Core
+RUN apt-get update && \
+    apt-get install -y wget && \
+    wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
     apt-get install -y dotnet-sdk-6.0 && \
     rm -rf /var/lib/apt/lists/*
 
-# PHP
+## PHP
 RUN apt-get update && \
     apt-get install -y php php-cli php-common php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath && \
     rm -rf /var/lib/apt/lists/*
 
-# Ruby
+## Ruby
 RUN apt-get update && \
     apt-get install -y ruby-full && \
     rm -rf /var/lib/apt/lists/*
 
-# تثبيت Docker داخل Docker (لأغراض التطوير)
-RUN curl -fsSL https://get.docker.com | sh
-
-# التحقق من اتصال الشبكة
-RUN curl -I https://open-vsx.org && \
-    curl -I https://marketplace.visualstudio.com
+# تثبيت Docker CLI فقط (بدون daemon)
+RUN apt-get update && \
+    apt-get install -y ca-certificates curl gnupg && \
+    install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    chmod a+r /etc/apt/keyrings/docker.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+    apt-get update && \
+    apt-get install -y docker-ce-cli && \
+    rm -rf /var/lib/apt/lists/*
 
 # تثبيت أدوات CLI إضافية
 RUN npm install -g \
@@ -94,7 +94,7 @@ RUN npm install -g \
     @vue/cli \
     create-react-app
 
-# تكوين Zsh كصدفة افتراضية مع Oh-My-Zsh
+# تثبيت Oh-My-Zsh مع plugins
 RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.5/zsh-in-docker.sh)" -- \
     -t robbyrussell \
     -p git \
@@ -104,7 +104,11 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
     -p https://github.com/zsh-users/zsh-syntax-highlighting \
     -p https://github.com/zsh-users/zsh-autosuggestions
 
-# نسخ ملفات التكوين المخصصة
+# تثبيت code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh && \
+    rm -rf /var/lib/apt/lists/*
+
+# نسخ ملفات التكوين
 COPY .zshrc /home/coder/.zshrc
 COPY settings.json /home/coder/.local/share/code-server/User/settings.json
 COPY extensions.sh /usr/local/bin/install-extensions
@@ -114,16 +118,18 @@ RUN chmod +x /usr/local/bin/install-extensions && \
     chown coder:coder /usr/local/bin/install-extensions && \
     sudo -u coder /usr/local/bin/install-extensions
 
-# تعيين الأذونات والمستخدم
-RUN chown -R coder:coder /home/coder && \
-    usermod -aG sudo coder && \
-    echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# تنظيف الذاكرة المؤقتة
+RUN apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf \
+    /var/lib/apt/lists/* \
+    /tmp/* \
+    /var/tmp/*
 
-# تعيين مجلد العمل
+# تعيين مجلد العمل والمستخدم
 WORKDIR /home/coder/project
-
-# تعيين المنفذ
+USER coder
 EXPOSE 8080
 
-# الأمر الافتراضي لبدء الخدمة
-ENTRYPOINT ["dumb-init", "code-server", "--bind-addr", "0.0.0.0:8080", "."]
+# أمر التشغيل
+ENTRYPOINT ["dumb-init", "code-server", "--bind-addr", "0.0.0.0:8080", "--auth", "none", "."]
