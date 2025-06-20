@@ -1,8 +1,0 @@
-bind-addr: 0.0.0.0:8080
-auth: password
-password: SecurePass@123
-cert: false
-disable-telemetry: true
-disable-update-check: true
-user-data-dir: /home/developer/.local/share/code-server
-extensions-dir: /home/developer/.local/share/code-server/extensions
